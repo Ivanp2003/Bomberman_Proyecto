@@ -1,0 +1,283 @@
+@startuml
+'Donde poner el metodo pausar? IG o IL?
+'Poner metodo detener en personaje?
+'Como generar el power up en un bloque?
+'Dejaremos los 4 niveles?
+
+package "Interfaz Lógica" {
+
+class Bomberman {
+- personaje: Personaje
+- nivel: Nivel
++ empezarJuego()
++ pausarJuego()
++ continuarJuego()
++ cargarPartida()
++ guardarPartida()
++ salirDelJuego()
++ guardarPuntaje()
+}
+
+abstract class Objeto {
+# nombre: String
+# ubicación x: double
+# ubicación y: double
+# destruirse()
++ aparecer()
+# reemplazar()
+    'Cuando se destruye un bloque se genere
+    'de forma randomica el power up,
+    'reemplazando a dicho bloque
+}
+
+class ObjetoIndestructible{
+}
+
+class Puerta{
++ irASiguienteNivel ()
+}
+
+Puerta -u-|> ObjetoIndestructible
+ObjetoIndestructible -u-|> Objeto
+
+abstract class PowerUp {
++ activarPowerUp()
+}
+
+PowerUp -u-|> Objeto
+
+class Bomba {
+- tiempoDetonación : int
+- alcanceEnx: int
+- alcanceEny: int
++ aparecer()
++ explotar()
+}
+
+Bomba -r-|> Objeto
+
+class BombasExtra {
++ incrementarCantidadBomba()
+}
+
+class ExplosiónExpandida {
++ aumentarAlcanceExplosión()
+}
+
+class Acelerador {
++ aumentarVelocidad()
+}
+
+class ControlRemoto {
++ detonarBomba()
+}
+
+class Kick {
++ empujarBomba()
+}
+
+class ArmaduraIndestructible {
+- tiempo: int
++ serIndestructible()
+}
+
+class TraspasarParedes {
++ traspasarParedes()
+}
+
+class Corazon {
++ aumentarVida()
+}
+
+Jugador -d-> "*" PowerUp
+BombasExtra -u-|> PowerUp
+ExplosiónExpandida -u-|> PowerUp
+Acelerador -u-|> PowerUp
+ControlRemoto -u-|> PowerUp
+Kick -u-|> PowerUp
+ArmaduraIndestructible -u-|> PowerUp
+TraspasarParedes -u-|> PowerUp
+Corazon -u-|> PowerUp
+
+
+Bomberman --> "*" Nivel
+Bomberman -d-> "*" Personaje
+
+abstract class Personaje {
+# puntaje: int
+# nombre: String
+# ubicación x: int
+# ubicación y: int
+# velocidad: int
+# vida: int
+# esTangible: boolean
++ mover()
+    'Excepcion: Try & Catch (Colision)
++ morir()
++ aparecer()
++ detener()
+}
+
+class Jugador {
+- puntajeTotal
+- cantidadDeBombasAColocar: int
+- tiempoDeInmunidad: int
++ colocarBomba()
++ obtenerPowerUp()
++ entrarPuerta()
++ verificarCantidadDePowerUps()
++ formatearPowerUps()
++ detectarPowerUp()
+}
+
+Jugador -u-|> Personaje
+Enemigo -u-|> Personaje
+
+abstract class Enemigo {
++ matar()
+}
+
+class SnowMan {
++ lanzarRoca()
+}
+
+SnowMan -u-|> Enemigo
+
+class Todora {
++ aumentarVelocidad()
++ detectar()
+}
+
+Todora -u-|> Enemigo
+
+class HawkMan {
+}
+
+HawkMan -u-|> Enemigo
+
+class Trent {
++ detectar()
+}
+
+Trent -u-|> Enemigo
+
+class BusterSlime{
++ aumentarVelocidad()
+}
+
+BusterSlime -u-|> Enemigo
+
+class LizardMan{
+}
+
+LizardMan -u-|> Enemigo
+Jugador -u-> "*" Bomba
+
+class Nivel {
+- tiempo: int
+- numeroDeEnemigos: int
+- enemigos: Enemigos[]
+- mapas : Mapas[]
+- numeroDeNivel: int
++ empezarNivel()
++ finalizarNivel()
++ cambiarDificultad()
++ reiniciarNivel()
++ establecerEnemigosPredeterminados()
++ agregarNuevoEnemigo()
++ pasarAlSiguienteNivel()
+}
+
+enum Dificultad{
++ FACIL(tiempo, numEnemigos)
++ DIFICIL (tiempo, numEnemigos)
++ getTiempo()
++ getNumeroDeEnemigos()
+}
+
+Nivel -r-> Dificultad
+
+
+
+Nivel -r-> Objeto
+Nivel --> Personaje
+}
+
+"Interfaz Gráfica" .l.> "Interfaz Lógica"
+
+package "Interfaz Gráfica" #DDD {
+
+abstract class InterfazGráfica {
+}
+
+InterfazGráfica --> PantallaReproducción
+
+class Musica {
++ reproducirMusica()
++ pausarMusica()
+}
+
+InterfazGráfica -r-> Musica
+
+abstract class PantallaReproducción{
+}
+
+class Menu {
+- JButtonIniciarJuego
+- JButtonSeleccionarPersoanje
+- JButtonSalir
+- JButtonverClasificación
+- JButtonNuevaPartida
+- JButtonCargarPartida
+- JLabelCreditos
+}
+
+Menu -u-|> PantallaReproducción
+
+abstract class PantallaFinalidad {
+}
+
+PantallaFinalidad -u-|> PantallaReproducción
+PantallaPause -u-|> PantallaReproducción
+
+class PantallaPause {
+}
+
+class PantallaSeleccionPersonaje {
+}
+
+PantallaSeleccionPersonaje -u-|> PantallaReproducción
+
+class PantallaGameOver {
+}
+
+PantallaGameOver -u-|> PantallaFinalidad
+
+class PantallaVictoria {
+}
+
+PantallaVictoria -u-|> PantallaFinalidad
+
+class PantallaMapaFacultades {
+}
+
+PantallaMapaFacultades --|> PantallaReproducción
+
+class PantallaInicioNivel {
+}
+
+class PantallaDelJuego {
+}
+
+class Movimiento {
+}
+
+InterfazGráfica --> Movimiento
+
+PantallaDelJuego -r-|> PantallaReproducción
+PantallaInicioNivel --|> PantallaReproducción
+
+
+
+}
+@enduml
